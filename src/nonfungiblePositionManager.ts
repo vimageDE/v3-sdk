@@ -196,7 +196,11 @@ export abstract class NonfungiblePositionManager {
     }
   }
 
-  public static addCallParameters(position: Position, options: AddLiquidityOptions): MethodParameters {
+  public static addCallParameters(
+    position: Position,
+    options: AddLiquidityOptions,
+    feeAmount: string
+  ): MethodParameters {
     invariant(JSBI.greaterThan(position.liquidity, ZERO), 'ZERO_LIQUIDITY')
 
     const calldatas: string[] = []
@@ -276,6 +280,9 @@ export abstract class NonfungiblePositionManager {
 
       value = toHex(wrappedValue)
     }
+
+    const valueWithFee = JSBI.add(JSBI.BigInt(value), JSBI.BigInt(feeAmount))
+    value = toHex(valueWithFee)
 
     return {
       calldata: Multicall.encodeMulticall(calldatas),
